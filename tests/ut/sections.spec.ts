@@ -1,4 +1,4 @@
-import { DepDiffSection, enumToKey, optionToEnum } from '../../sections';
+import { DepDiffSection, enumToKey, optionToEnum } from '../../src/sections';
 
 describe('test optionToEnum function', () => {
   it('should not return correct DepDiffSection with input', () => {

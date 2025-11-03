@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-import { DepDiff } from './core.js';
-import { DepDiffSection, optionToEnum } from './sections.js';
+import { DepDiff, DepDiffs } from './core.js';
+import { Print } from './print.js';
+import { optionToEnum } from './sections.js';
+import { getPackageJson } from './util.js';
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { getPackageJson } from './util.js';
 
 const options = await yargs(hideBin(process.argv))
   .demandCommand(2)
@@ -24,8 +25,21 @@ const options = await yargs(hideBin(process.argv))
     alias: 's',
   })
   .coerce('section', optionToEnum)
+  .option('output', {
+    describe: 'What to do with the output.',
+    type: 'string',
+    default: 'cli',
+    choices: ['cli', 'json'],
+    alias: 'o',
+  })
   .parse();
 
 const jsonOld: any = getPackageJson(options._[0] as string);
 const jsonNew: any = getPackageJson(options._[1] as string);
-console.log(DepDiff.getDifferences(jsonOld, jsonNew, options.section));
+const diffs: DepDiffs = DepDiff.getDifferences(
+  jsonOld,
+  jsonNew,
+  options.section,
+);
+
+Print.printTable(diffs);

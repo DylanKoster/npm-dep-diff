@@ -1,10 +1,10 @@
-import { getPackageJson, haveSameKeys } from '../../util';
+import { getPackageJson, haveSameKeys } from '../../src/util';
 
 type ObjectValues = NumberConstructor | BooleanConstructor | StringConstructor;
 
 describe('test getPackageJson function', () => {
   it('should return valid JSON on correct input', () => {
-    const json: object = getPackageJson('src/tests/files/package-2.json');
+    const json: object = getPackageJson('tests/files/package-2.json');
 
     expect(Object.keys(json)).toContain('dependencies');
     expect(Object.keys(json)).toContain('bin');
@@ -13,13 +13,13 @@ describe('test getPackageJson function', () => {
 
   it('should throw an error on an non-existing file.', () => {
     expect(() => {
-      getPackageJson('src/tests/files/package-nonexistant.json');
+      getPackageJson('tests/files/package-nonexistant.json');
     }).toThrow(Error);
   });
 
   it('should throw an error when the file does not contain json', () => {
     expect(() => {
-      getPackageJson('src/tests/files/text.txt');
+      getPackageJson('tests/files/text.txt');
     }).toThrow(SyntaxError);
   });
 });

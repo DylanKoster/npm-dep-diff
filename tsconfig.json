@@ -8,7 +8,7 @@
     "baseUrl": "./",
     "outDir": "./dist/",
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "strict": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -18,16 +18,18 @@
     "sourceMap": true,
     "declaration": true,
     "experimentalDecorators": true,
-    // "importHelpers": true,
     "target": "esnext",
     "module": "esnext",
     "useDefineForClassFields": false,
-    "lib": ["esnext", "dom"]
-  },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true
-  }
+    "lib": ["esnext", "dom"],
+    "paths": {
+        "@src/*": ["src/*"],
+        "@test/*": ["tests/*"],
+    },
+    "moduleResolution": "node"
+},
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

@@ -1,11 +1,22 @@
-import { DepDiffSection, enumToKey } from './sections';
-import { haveSameKeys } from './util';
+import { DepDiffSection, enumToKey } from './sections.js';
+import { haveSameKeys } from './util.js';
+
+export enum DiffType {
+  added,
+  removed,
+  major,
+  minor,
+  patch,
+}
 
 export type DependencyDifference = {
   package: string;
-  old: string;
-  new: string;
+  old?: string;
+  new?: string;
+  type: DiffType | null;
 };
+
+export type DepDiffs = Record<string, DependencyDifference[]>;
 
 export class DepDiff {
   /**
@@ -82,31 +93,33 @@ export class DepDiff {
     const newKeys: Set<string> = new Set(Object.keys(newObj ?? {}));
 
     // Add new packages to diff
-    for (const newKey of newKeys.difference(oldKeys)) {
-      diffs.push({
-        package: newKey,
-        old: undefined,
-        new: newObj[newKey],
-      } as DependencyDifference);
+    for (const newKey of newKeys) {
+      if (!oldKeys.has(newKey)) {
+        diffs.push(DepDiff.createDifference(newKey, undefined, newObj[newKey]));
+      }
     }
 
     // Add removed packages to diff
-    for (const oldKey of oldKeys.difference(newKeys)) {
-      diffs.push({
-        package: oldKey,
-        old: oldObj[oldKey],
-        new: undefined,
-      } as DependencyDifference);
+    for (const oldKey of oldKeys) {
+      if (!newKeys.has(oldKey)) {
+        diffs.push(DepDiff.createDifference(oldKey, oldObj[oldKey], undefined));
+      }
     }
 
     // Add changed packages to diff
-    for (const changedKey of newKeys.intersection(oldKeys)) {
-      if (oldObj[changedKey] === newObj[changedKey]) continue;
-      diffs.push({
-        package: changedKey,
-        old: oldObj[changedKey],
-        new: newObj[changedKey],
-      } as DependencyDifference);
+    for (const changedKey of newKeys) {
+      if (
+        oldKeys.has(changedKey) &&
+        oldObj[changedKey] !== newObj[changedKey]
+      ) {
+        diffs.push(
+          DepDiff.createDifference(
+            changedKey,
+            oldObj[changedKey],
+            newObj[changedKey],
+          ),
+        );
+      }
     }
 
     return diffs;
@@ -130,5 +143,78 @@ export class DepDiff {
     }
 
     return object;
+  }
+
+  private static createDifference(
+    key: string,
+    oldValue?: string,
+    newValue?: string,
+  ) {
+    const type: DiffType | null = DepDiff.getDiffType(oldValue, newValue);
+    return {
+      package: key,
+      old: oldValue,
+      new: newValue,
+      type: type,
+    } as DependencyDifference;
+  }
+
+  private static getDiffType(
+    oldValue?: string,
+    newValue?: string,
+  ): DiffType | null {
+    if (!oldValue && !newValue) return null;
+    if (!oldValue) return DiffType.added;
+    if (!newValue) return DiffType.removed;
+
+    const oldParts = DepDiff.splitVersion(oldValue);
+    const newParts = DepDiff.splitVersion(newValue);
+
+    if (!oldParts || !newParts) return null; // invalid version format
+
+    const [oldMajor, oldMinor, oldPatch] = oldParts;
+    const [newMajor, newMinor, newPatch] = newParts;
+
+    if (oldMajor !== newMajor) return DiffType.major;
+    if (oldMinor !== newMinor) return DiffType.minor;
+    if (oldPatch !== newPatch) return DiffType.patch;
+
+    return null; // no change
+  }
+
+  /**
+   * Splits the value in the major, minor, and patch versions. The input should be in the format x.x(.x).
+   *
+   * @param value The full version string
+   *
+   * @returns
+   */
+  private static splitVersion(version: string): number[] | null {
+    const numPrefixChars: number = DepDiff.getPrefixSize(version);
+    version = version.slice(numPrefixChars);
+    const parts = version.split('.');
+
+    if (parts.length > 3) return null;
+
+    const nums = parts.map((version: string) => parseInt(version, 10));
+    if (nums.some(isNaN)) return null;
+
+    return nums;
+  }
+
+  private static getPrefixSize(version: string): number {
+    if (version.startsWith('^')) {
+      return 1;
+    } else if (version.startsWith('~')) {
+      return 1;
+    } else if (version.startsWith('>=')) {
+      return 2;
+    } else if (version.startsWith('<')) {
+      return 1;
+    } else if (version.startsWith('||')) {
+      return 2;
+    }
+
+    return 0;
   }
 }
