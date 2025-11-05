@@ -1,55 +1,61 @@
-import { DepDiffSection, enumToKey, optionToEnum } from '../../src/sections';
+import { DepDiffSection, DepDiffSectionUtil } from '../../src/options/sections';
 
-describe('test optionToEnum function', () => {
+describe('test DepDiffSectionUtil.optionToEnum function', () => {
   it('should not return correct DepDiffSection with input', () => {
-    expect(optionToEnum('deps')).toBe(DepDiffSection.deps);
-    expect(optionToEnum('dev')).toBe(DepDiffSection.dev);
-    expect(optionToEnum('peer')).toBe(DepDiffSection.peer);
-    expect(optionToEnum('all')).toBe(DepDiffSection.all);
+    expect(DepDiffSectionUtil.optionToEnum('deps')).toBe(DepDiffSection.deps);
+    expect(DepDiffSectionUtil.optionToEnum('dev')).toBe(DepDiffSection.dev);
+    expect(DepDiffSectionUtil.optionToEnum('peer')).toBe(DepDiffSection.peer);
+    expect(DepDiffSectionUtil.optionToEnum('all')).toBe(DepDiffSection.all);
   });
 
   it('should return error if input is invalid', () => {
     expect(() => {
-      optionToEnum('test');
+      DepDiffSectionUtil.optionToEnum('test');
     }).toThrow(Error);
 
     expect(() => {
-      optionToEnum('devs');
+      DepDiffSectionUtil.optionToEnum('devs');
     }).toThrow(Error);
 
     expect(() => {
-      optionToEnum('');
+      DepDiffSectionUtil.optionToEnum('');
     }).toThrow(Error);
 
     expect(() => {
-      optionToEnum(undefined);
+      DepDiffSectionUtil.optionToEnum(undefined);
     }).toThrow(Error);
 
     expect(() => {
-      optionToEnum(null);
+      DepDiffSectionUtil.optionToEnum(null);
     }).toThrow(Error);
   });
 });
 
-describe('test enumToKey function', () => {
+describe('test DepDiffSectionUtil.enumToKey function', () => {
   it('should return correct DepDiffSection object on correct input', () => {
-    expect(enumToKey(DepDiffSection.all)).toStrictEqual([
+    expect(DepDiffSectionUtil.enumToKey(DepDiffSection.all)).toStrictEqual([
       'dependencies',
       'devDependencies',
       'peerDependencies',
     ]);
-    expect(enumToKey(DepDiffSection.deps)).toStrictEqual(['dependencies']);
-    expect(enumToKey(DepDiffSection.dev)).toStrictEqual(['devDependencies']);
-    expect(enumToKey(DepDiffSection.peer)).toStrictEqual(['peerDependencies']);
+    expect(DepDiffSectionUtil.enumToKey(DepDiffSection.deps)).toStrictEqual([
+      'dependencies',
+    ]);
+    expect(DepDiffSectionUtil.enumToKey(DepDiffSection.dev)).toStrictEqual([
+      'devDependencies',
+    ]);
+    expect(DepDiffSectionUtil.enumToKey(DepDiffSection.peer)).toStrictEqual([
+      'peerDependencies',
+    ]);
   });
 
   it('should throw an error on null or undefined input', () => {
     expect(() => {
-      enumToKey(null);
+      DepDiffSectionUtil.enumToKey(null);
     }).toThrow(Error);
 
     expect(() => {
-      enumToKey(undefined);
+      DepDiffSectionUtil.enumToKey(undefined);
     }).toThrow(Error);
   });
 });
