@@ -1,4 +1,7 @@
-import { DepDiffSection, DepDiffSectionUtil } from '../../src/options/sections';
+import {
+  DepDiffSection,
+  DepDiffSectionUtil,
+} from '../../../src/options/sections';
 
 describe('test DepDiffSectionUtil.optionToEnum function', () => {
   it('should not return correct DepDiffSection with input', () => {

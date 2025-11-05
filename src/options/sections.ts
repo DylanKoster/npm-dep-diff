@@ -23,6 +23,8 @@ export class DepDiffSectionUtil {
    *
    * @returns The name of the relevant JSON section, either 'dependencies', 'devDependenvies', 'peerDependencies', or all
    *          of them.
+   *
+   * @throws Error if section is null or undefined.
    */
   public static enumToKey(section: DepDiffSection): string[] {
     if (!section) throw Error('Section may not be null or undefined.');
@@ -35,6 +37,8 @@ export class DepDiffSectionUtil {
    * @param option The string object, should be either 'deps', 'dev', 'peer', or 'all'.
    *
    * @returns The DepDiffSection value that is associated with the given option.
+   *
+   * @throws Error if the option does not exist on the DepDiffSection enum.
    */
   public static optionToEnum(option: string): DepDiffSection {
     if (!(option in DepDiffSection))

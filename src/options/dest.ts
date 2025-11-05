@@ -17,6 +17,7 @@ export class DepDiffDestUtil {
    * checking if the output should be written to a file or to stdout/stderr via DepDiffTest.toCLI();
    *
    * @param option The option parsed into the CLI.
+   *
    * @returns A newly created DepDiffDest with the correct type and the file destination, if applicable.
    */
   public static createDepDiffDest(option: string): DepDiffDest {
@@ -43,8 +44,15 @@ export class DepDiffDestUtil {
    * @param option The string object, should be either 'json', or 'cli'.
    *
    * @returns The DepDiffDestType value that is associated with the given option.
+   *
+   * @throws Error if option is null or undefined.
    */
   public static optionToEnum(option: string): DepDiffDestType {
+    if (!option)
+      throw Error(
+        `Value ${option} does not exist on the DepDiffDestType enum.`,
+      );
+
     if (!(option in DepDiffDestType)) return DepDiffDestType.file;
     return option as DepDiffDestType;
   }
