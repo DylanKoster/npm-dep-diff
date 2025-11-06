@@ -1,12 +1,12 @@
-import { DepDiffSection, enumToKey } from './sections.js';
+import { DepDiffSection, DepDiffSectionUtil } from './options/sections.js';
 import { haveSameKeys } from './util.js';
 
 export enum DiffType {
-  added,
-  removed,
-  major,
-  minor,
-  patch,
+  added = 'added',
+  removed = 'removed',
+  major = 'major',
+  minor = 'minor',
+  patch = 'patch',
 }
 
 export type DependencyDifference = {
@@ -36,12 +36,12 @@ export class DepDiff {
   ): Record<string, DependencyDifference[]> {
     const jsonOldSections: any = DepDiff.getRelevantSections(
       oldJson,
-      enumToKey(sections),
+      DepDiffSectionUtil.enumToKey(sections),
     );
 
     const jsonNewSections: any = DepDiff.getRelevantSections(
       newJson,
-      enumToKey(sections),
+      DepDiffSectionUtil.enumToKey(sections),
     );
 
     return DepDiff.compareObjects(jsonOldSections, jsonNewSections);
