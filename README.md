@@ -32,6 +32,10 @@
 - **🔧 Developer-Friendly**: Simple CLI interface that integrates easily into development workflows and CI/CD pipelines
 - **🎯 Flexible Comparison**: Compare specific dependency sections (production, dev, peer) or all at once
 
+<div align="center">
+<a href="https://github.com/DylanKoster/dep-diff/issues/new?labels=bug&template=bug-report---.md">Report Bug</a> · <a href="https://github.com/DylanKoster/dep-diff/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+</div>
+
 ---
 
 ## Table of Contents
