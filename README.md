@@ -13,8 +13,8 @@
 
 [![Issues](https://img.shields.io/github/issues/DylanKoster/npm-dep-diff?style=plastic&labelColor=%23333a41)](https://github.com/DylanKoster/npm-dep-diff/issues)
 [![PRs](https://img.shields.io/github/issues-pr/DylanKoster/npm-dep-diff?style=plastic&labelColor=%23333a41
-)]((https://github.com/DylanKoster/npm-dep-diff/pulls))
-[![Contributors](https://img.shields.io/github/contributors/DylanKoster/paashaas?style=plastic&labelColor=%23333a41)](https://github.com/DylanKoster/npm-dep-diff/graphs/contributors)
+)](https://github.com/DylanKoster/npm-dep-diff/pulls)
+[![Contributors](https://img.shields.io/github/contributors/DylanKoster/npm-dep-diff?style=plastic&labelColor=%23333a41)](https://github.com/DylanKoster/npm-dep-diff/graphs/contributors)
 [![Tests](https://github.com/DylanKoster/npm-dep-diff/actions/workflows/test.yml/badge.svg?label=Tests)](https://github.com/DylanKoster/npm-dep-diff/actions/workflows/test.yml)
 
 
