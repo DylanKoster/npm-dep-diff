@@ -318,16 +318,6 @@ npm-dep-diff/
 
 ---
 
-## Future work
-
-The following features are planned on being released:
- - GIT ref compatibility: Being able to compare with git references (branch HEADS, releases, tags).
- - NPM packages: Ability to compare with existing NPM packages (and older versions).
-
- For implementation, details need to be worked out, join the discussion in the [Issues](https://github.com/DylanKoster/npm-dep-diff/issues)!
-
----
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
