@@ -1,3 +1,5 @@
+process.env['NODE_DEV'] = 'TEST';
+
 import {
   DepDiffSection,
   DepDiffSectionUtil,

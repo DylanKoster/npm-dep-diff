@@ -1,7 +1,7 @@
 import fs from 'fs';
 import simpleGit from 'simple-git';
 
-const enum InputType {
+export const enum InputType {
   NPM = 'npm',
   GIT = 'git',
   FILE = 'file',
@@ -180,4 +180,11 @@ function getPackageFromNpm(input: InputSource): Promise<object> {
     .then(([versions, version]: [object, string]) => {
       return versions[version];
     });
+}
+
+// Export private functions only in testing environment
+if (process.env['NODE_DEV'] == 'TEST') {
+  module.exports.getPackageFromFile = getPackageFromFile;
+  module.exports.getPackageFromGit = getPackageFromGit;
+  module.exports.getPackageFromNpm = getPackageFromNpm;
 }
