@@ -85,17 +85,20 @@ function getPackageFromFile(
   input: InputSource,
   encoding: BufferEncoding = 'utf-8',
 ): Promise<object> {
-  if (input.type !== InputType.FILE)
-    throw Error(`Wrong type, expected file, got ${input.type}.`);
+  return new Promise(function (resolve, rejects) {
+    if (input.type !== InputType.FILE)
+      rejects(`Wrong type, expected file, got ${input.type}.`);
 
-  if (!fs.existsSync(input.source))
-    throw new Error(`File not found: ${input.source}`);
+    if (!fs.existsSync(input.source))
+      rejects(`File not found: ${input.source}`);
 
-  return new Promise(function (resolve, _) {
     fs.readFile(input.source, encoding, (err, src) => {
-      if (err) throw Error(`Error reading file ${input.source}`);
-
-      resolve(JSON.parse(src));
+      if (err) rejects(`Error reading file ${input.source}`);
+      try {
+        resolve(JSON.parse(src));
+      } catch (err) {
+        rejects('Error parsing JSON');
+      }
     });
   });
 }
@@ -112,21 +115,24 @@ function getPackageFromFile(
  *
  * @returns An JSON object representing the source file contents.
  */
-async function getPackageFromGit(
-  input: InputSource,
-  encoding: BufferEncoding = 'utf-8',
-): Promise<object> {
-  if (input.type !== InputType.GIT)
-    throw Error(`Wrong type, expected GIT, got ${input.type}.`);
+async function getPackageFromGit(input: InputSource): Promise<object> {
+  return new Promise(function (resolve, reject) {
+    if (input.type !== InputType.GIT)
+      reject(`Wrong type, expected GIT, got ${input.type}.`);
 
-  return simpleGit()
-    .show(`${input.source}:package.json`)
-    .catch((err) => {
-      throw Error(`Error getting git ref: ${err}`);
-    })
-    .then((value) => {
-      return JSON.parse(value);
-    });
+    return simpleGit()
+      .show(`${input.source}:package.json`)
+      .catch((err) => {
+        reject(`Error getting git ref.`);
+      })
+      .then((value: string) => {
+        try {
+          resolve(JSON.parse(value));
+        } catch (err) {
+          reject('Error parsing JSON.');
+        }
+      });
+  });
 }
 
 /**
@@ -141,45 +147,51 @@ async function getPackageFromGit(
  * @returns An JSON object representing the source file contents.
  */
 function getPackageFromNpm(input: InputSource): Promise<object> {
-  if (input.type !== InputType.NPM)
-    throw Error(`Wrong type, expected NPM, got ${input.type}.`);
+  return new Promise(function (resolve, reject) {
+    if (input.type !== InputType.NPM)
+      reject(`Wrong type, expected NPM, got ${input.type}.`);
 
-  let src = input.source;
+    let src = input.source;
 
-  const regex: RegExp = /.+@\d+.?\d*.?\d*/;
-  let name: string;
-  let version: string;
-  if (!regex.test(src)) {
-    name = src;
-    version = 'latest';
-  } else {
-    const splits: string[] = src.split('@');
-    version = splits.pop();
-    // If, somehow, the name contains an @, re-add it.
-    name = splits.join('@');
-  }
+    const regex: RegExp = /.+@(?:(?:\d+.?\d*.?\d*)|(?:latest))/;
+    let name: string;
+    let version: string;
+    if (!regex.test(src)) {
+      name = src;
+      version = 'latest';
+    } else {
+      const splits: string[] = src.split('@');
+      version = splits.pop();
+      // If, somehow, the name contains an @, re-add it.
+      name = splits.join('@');
+    }
 
-  return fetch(`https://registry.npmjs.org/${name}`)
-    .catch((err) => {
-      throw Error(`Error thrown while gathering manifest for ${src}: ${err}`);
-    })
-    .then((resp: Response) => {
-      if (resp.status < 200 || resp.status >= 300)
-        throw Error(
-          `Status of call https://registry.npmjs.org/${name} is not OK.`,
-        );
+    return fetch(`https://registry.npmjs.org/${name}`)
+      .then((resp: Response) => {
+        if (resp.status < 200 || resp.status >= 300) {
+          return Promise.reject(
+            `Status of call https://registry.npmjs.org/${name} is not OK.`,
+          );
+        }
 
-      return resp.json();
-    })
-    .then((json: object) => {
-      if (version !== 'latest') return [json['versions'], version];
+        return resp.json();
+      })
+      .then((json: object) => {
+        if (!json || !json['versions']) {
+          return Promise.reject('JSON result is null');
+        }
+        if (version !== 'latest') return [json['versions'], version];
 
-      const keys: string[] = Object.keys(json['versions']);
-      return [json['versions'], keys[keys.length - 1]];
-    })
-    .then(([versions, version]: [object, string]) => {
-      return versions[version];
-    });
+        const keys: string[] = Object.keys(json['versions']);
+        return [json['versions'], keys[keys.length - 1]];
+      })
+      .then(([versions, version]: [object, string]) => {
+        resolve(versions[version]);
+      })
+      .catch((err) => {
+        reject(`Error thrown while gathering manifest for ${src}: ${err}`);
+      });
+  });
 }
 
 // Export private functions only in testing environment
