@@ -27,7 +27,7 @@
 
 
 <h2>The dependency comparison tool.</h2>
-<strong>npm-dep-diff</strong> is a versatile CLI tool that enables developers to compare NPM package dependencies between local files. Support for git refs and npm packages will be added later. Reports can be generated in table or JSON format.
+<strong>npm-dep-diff</strong> is a versatile CLI tool that enables developers to compare NPM package dependencies between local files, git references, and npm packages. Reports can be generated in table or JSON format.
 
 </div>
 
@@ -91,9 +91,26 @@ npm link
 npm-dep-diff [options] <oldSrc> <newSrc>
 ```
 
-Compare dependencies between two package.json sources. Sources are local file paths to package.json files
+Compare dependencies between two sources. Sources are local file paths to package.json files or npm and git references. Source details are provided in [Arguments](#arguments).
 
 ---
+
+## Arguments
+
+_oldSrc_ and _newSrc_ are the positional arguments for _npm-dep-diff_. These represent the old and new npm source to be compared, respectively. These can have four types:
+ 1. A JSON file, in the NPM package.json style.
+ 1. A directory, should be the root directory of a NPM package, containing a file called package.json that follows the package.json format.
+ 1. A git reference, can be a branch, commit, tag, or release, that contains the code for a NPM package.
+ 1. A NPM package that is published on the npm registery. The version can be added with the common _@_ as a separator: _\<name\>@\<version\>_
+
+To specify the type, _npm-dep-diff_ requires the type to be prepended to the actual source path.
+ - For files or directories, use the _file:_ prefix, e.g.: _file:./package.json_ or _file:./npm/_
+ - For git references, use the _git:_ prefix, e.g.: _git:HEAD_ or _git:\<hash\>_
+ - For NPM packages, use the _npm:_ prefix, e.g.: _npm:axios@latest_
+
+If no prefix is provided, _npm-dep-diff_ will assume the source is a file.
+
+_Note:_ In the future, _npm-dep-diff_ will allow no prefix to be provided, and will try to infer the type by using the source context.
 
 ## Options
 
@@ -201,7 +218,7 @@ Example output:
 ├──────────────────────────────┼────────────────────┼───┼────────────────────┼──────────┤
 │ - react-router-dom           │       ^7.1.0       │   │                    │ removed  │
 ├──────────────────────────────┼────────────────────┼───┼────────────────────┼──────────┤
-│ ~ react                      │      ^18.3.1       │ → │      ^19.2.0       │ 2        │
+│ ~ react                      │      ^18.3.1       │ → │      ^19.2.0       │ major    │
 └──────────────────────────────┴────────────────────┴───┴────────────────────┴──────────┘
 ```
 
@@ -292,22 +309,14 @@ npm run build
 npm-dep-diff/
 ├── src/                     # Source code
 |   ├── options/             # CLI options classes
-|   ├── output/               # Output formatters
+|   ├── output/              # Output formatters
 ├── tests/                   # Test files
-│   └── ut/                  # Unit tests
+|   ├── files/               # Example package.json files
+│   ├── ut/                  # Unit tests
+|   └── it/                  # Integration tests
 ├── tools/                   # Build tools
-└── build/                   # Compiled output
+└── dist/                    # Compiled output
 ```
-
----
-
-## Future work
-
-The following features are planned on being released:
- - GIT ref compatibility: Being able to compare with git references (branch HEADS, releases, tags).
- - NPM packages: Ability to compare with existing NPM packages (and older versions).
-
- For implementation, details need to be worked out, join the discussion in the [Issues](https://github.com/DylanKoster/npm-dep-diff/issues)!
 
 ---
 

@@ -1,28 +1,8 @@
-import { getPackageJson, haveSameKeys } from '../../src/util';
+process.env['NODE_DEV'] = 'TEST';
+
+import { haveSameKeys } from '../../src/util';
 
 type ObjectValues = NumberConstructor | BooleanConstructor | StringConstructor;
-
-describe('test getPackageJson function', () => {
-  it('should return valid JSON on correct input', () => {
-    const json: object = getPackageJson('tests/files/package-2.json');
-
-    expect(Object.keys(json)).toContain('dependencies');
-    expect(Object.keys(json)).toContain('bin');
-    expect(Object.keys(json)).toContain('author');
-  });
-
-  it('should throw an error on an non-existing file.', () => {
-    expect(() => {
-      getPackageJson('tests/files/package-nonexistant.json');
-    }).toThrow(Error);
-  });
-
-  it('should throw an error when the file does not contain json', () => {
-    expect(() => {
-      getPackageJson('tests/files/text.txt');
-    }).toThrow(SyntaxError);
-  });
-});
 
 describe('test haveSameKeys function', () => {
   it('should return true on empty objects', () => {

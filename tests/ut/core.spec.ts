@@ -1,6 +1,9 @@
+process.env['NODE_DEV'] = 'TEST';
+
 import { DepDiffSection } from '../../src/options/sections';
 import { NpmDepDiff, DependencyDifference, DiffType } from '../../src/core';
-import { getPackageJson } from '../../src/util';
+// @ts-expect-error
+import { InputSource, InputType, getPackageFromFile } from '../../src/input';
 
 describe('test getRelevantSections function', () => {
   const json: object = {
@@ -450,8 +453,11 @@ describe('test getDifferences function', () => {
     );
   });
 
-  it('should only contain old differences on second input empty', () => {
-    const pckg4: object = getPackageJson('tests/files/package-4.json');
+  it('should only contain old differences on second input empty', async () => {
+    const pckg4: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-4.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       dependencies: [
         {
@@ -564,8 +570,11 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff2);
   });
 
-  it('should only contain new differences on first input empty', () => {
-    const pckg1: object = getPackageJson('tests/files/package-1.json');
+  it('should only contain new differences on first input empty', async () => {
+    const pckg1: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-1.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       dependencies: [
         {
@@ -720,9 +729,15 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff2);
   });
 
-  it('should contain correct differences on package-3.json and package-6.json and all dependencies', () => {
-    const pckg3: object = getPackageJson('tests/files/package-3.json');
-    const pckg6: object = getPackageJson('tests/files/package-6.json');
+  it('should contain correct differences on package-3.json and package-6.json and all dependencies', async () => {
+    const pckg3: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-3.json',
+    } as InputSource);
+    const pckg6: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-6.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       dependencies: [
         {
@@ -803,9 +818,15 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff1);
   });
 
-  it('should only contain dependencies when sections = deps', () => {
-    const pckg3: object = getPackageJson('tests/files/package-3.json');
-    const pckg6: object = getPackageJson('tests/files/package-6.json');
+  it('should only contain dependencies when sections = deps', async () => {
+    const pckg3: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-3.json',
+    } as InputSource);
+    const pckg6: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-6.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       dependencies: [
         {
@@ -864,9 +885,15 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff1);
   });
 
-  it('should only contain devDependencies when sections = dev', () => {
-    const pckg2: object = getPackageJson('tests/files/package-2.json');
-    const pckg5: object = getPackageJson('tests/files/package-5.json');
+  it('should only contain devDependencies when sections = dev', async () => {
+    const pckg2: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-2.json',
+    } as InputSource);
+    const pckg5: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-5.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       devDependencies: [
         {
@@ -901,9 +928,15 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff1);
   });
 
-  it('should only contain devDependencies when sections = dev', () => {
-    const pckg2: object = getPackageJson('tests/files/package-2.json');
-    const pckg5: object = getPackageJson('tests/files/package-5.json');
+  it('should only contain devDependencies when sections = dev', async () => {
+    const pckg2: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-2.json',
+    } as InputSource);
+    const pckg5: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-5.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       devDependencies: [
         {
@@ -938,9 +971,15 @@ describe('test getDifferences function', () => {
     ).toStrictEqual(diff1);
   });
 
-  it('should only contain peerDependencies when sections = peer', () => {
-    const pckg7: object = getPackageJson('tests/files/package-7.json');
-    const pckg8: object = getPackageJson('tests/files/package-8.json');
+  it('should only contain peerDependencies when sections = peer', async () => {
+    const pckg7: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-7.json',
+    } as InputSource);
+    const pckg8: object = await getPackageFromFile({
+      type: InputType.FILE,
+      source: 'tests/files/package-8.json',
+    } as InputSource);
     const diff1: Record<string, DependencyDifference[]> = {
       peerDependencies: [
         {
