@@ -91,7 +91,7 @@ npm link
 npm-dep-diff [options] <oldSrc> <newSrc>
 ```
 
-Compare dependencies between two package.json sources. Sources are local file paths to package.json files or npm and git references. Source details are provided in [Arguments](#arguments).
+Compare dependencies between two sources. Sources are local file paths to package.json files or npm and git references. Source details are provided in [Arguments](#arguments).
 
 ---
 

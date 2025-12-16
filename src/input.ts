@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { Stats } from 'fs';
 import simpleGit from 'simple-git';
 
 export const enum InputType {
@@ -92,8 +92,13 @@ function getPackageFromFile(
     if (!fs.existsSync(input.source))
       rejects(`File not found: ${input.source}`);
 
-    fs.readFile(input.source, encoding, (err, src) => {
-      if (err) rejects(`Error reading file ${input.source}`);
+    const stats: Stats = fs.statSync(input.source);
+    let source: string = input.source;
+
+    if (stats.isDirectory()) source += '/package.json';
+
+    fs.readFile(source, encoding, (err, src) => {
+      if (err) rejects(`Error reading file ${source}`);
       try {
         resolve(JSON.parse(src));
       } catch (err) {
