@@ -169,7 +169,7 @@ function getPackageFromNpm(input: InputSource): Promise<object> {
     return fetch(`https://registry.npmjs.org/${name}`)
       .then((resp: Response) => {
         if (resp.status < 200 || resp.status >= 300) {
-          return Promise.reject(
+          reject(
             `Status of call https://registry.npmjs.org/${name} is not OK.`,
           );
         }
@@ -178,7 +178,9 @@ function getPackageFromNpm(input: InputSource): Promise<object> {
       })
       .then((json: object) => {
         if (!json || !json['versions']) {
-          return Promise.reject('JSON result is null');
+          reject(
+            'JSON result of call to https://registry.npmjs.org/${name} is null',
+          );
         }
         if (version !== 'latest') return [json['versions'], version];
 
@@ -186,7 +188,11 @@ function getPackageFromNpm(input: InputSource): Promise<object> {
         return [json['versions'], keys[keys.length - 1]];
       })
       .then(([versions, version]: [object, string]) => {
-        resolve(versions[version]);
+        if (!versions[version]) {
+          reject(`Version ${version} not found for package ${name}`);
+        } else {
+          resolve(versions[version]);
+        }
       })
       .catch((err) => {
         reject(`Error thrown while gathering manifest for ${src}: ${err}`);

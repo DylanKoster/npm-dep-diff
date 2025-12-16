@@ -230,20 +230,22 @@ describe('test getPackageFromNpm', () => {
   });
 
   it('should throw an Error if the version does not exist', async () => {
-    expect(async () => {
-      await getPackageFromNpm({
+    expect(
+      getPackageFromNpm({
         type: InputType.NPM,
         source: 'base-sepolia-starter@10.0.1',
-      } as InputSource);
-    }).rejects.toMatch(
-      'Status of call https://registry.npmjs.org/non-existent-package is not OK.',
+      } as InputSource),
+    ).rejects.toMatch(
+      'Version 10.0.1 not found for package base-sepolia-starter',
     );
 
-    await expect(async () => {
+    await expect(
       getPackageFromNpm({
         type: InputType.NPM,
         source: 'base-sepolia-starter@0.0.1',
-      } as InputSource);
-    }).rejects.toMatch('dwadawd');
+      } as InputSource),
+    ).rejects.toMatch(
+      'Version 0.0.1 not found for package base-sepolia-starter',
+    );
   });
 });
