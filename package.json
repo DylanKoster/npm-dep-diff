@@ -1,6 +1,6 @@
 {
   "name": "npm-dep-diff",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Describe the difference in dependencies between two sources",
   "main": "npm-dep-diff.js",
   "bin": "cli.js",
