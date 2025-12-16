@@ -4,19 +4,23 @@ const cli: string = 'node dist/cli.js';
 const timeout: number = 10000;
 
 describe('CLI Integration Tests', () => {
-  it('should compare two package.json files', (done) => {
-    exec(
-      `${cli} file:tests/files/package-1.json file:tests/files/package-2.json`,
-      (err, stdout, stderr) => {
-        expect(err).toBeNull();
-        expect(stderr).toBe('');
-        expect(stdout).toContain('dependencies');
-        expect(stdout).toContain('added');
-        expect(stdout).toContain('removed');
-        done();
-      },
-    );
-  }, 10000);
+  it(
+    'should compare two package.json files',
+    (done) => {
+      exec(
+        `${cli} file:tests/files/package-1.json file:tests/files/package-2.json`,
+        (err, stdout, stderr) => {
+          expect(err).toBeNull();
+          expect(stderr).toBe('');
+          expect(stdout).toContain('dependencies');
+          expect(stdout).toContain('added');
+          expect(stdout).toContain('removed');
+          done();
+        },
+      );
+    },
+    timeout,
+  );
 
   it(
     'should output in JSON format',
