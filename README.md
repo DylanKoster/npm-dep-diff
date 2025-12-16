@@ -91,7 +91,7 @@ npm link
 npm-dep-diff [options] <oldSrc> <newSrc>
 ```
 
-Compare dependencies between two package.json sources. Sources are local file paths to package.json files
+Compare dependencies between two package.json sources. Sources are local file paths to package.json files or npm and git references. Source details are provided in [Arguments](#arguments).
 
 ---
 
@@ -105,7 +105,7 @@ _oldSrc_ and _newSrc_ are the positional arguments for _npm-dep-diff_. These rep
 
 To specify the type, _npm-dep-diff_ requires the type to be prepended to the actual source path.
  - For files or directories, use the _file:_ prefix, e.g.: _file:./package.json_ or _file:./npm/_
- - For git references, use the _git:_ prefix, e.g.: _git:HEAD_
+ - For git references, use the _git:_ prefix, e.g.: _git:HEAD_ or _git:\<hash\>_
  - For NPM packages, use the _npm:_ prefix, e.g.: _npm:axios@latest_
 
 If no prefix is provided, _npm-dep-diff_ will assume the source is a file.
@@ -218,7 +218,7 @@ Example output:
 ├──────────────────────────────┼────────────────────┼───┼────────────────────┼──────────┤
 │ - react-router-dom           │       ^7.1.0       │   │                    │ removed  │
 ├──────────────────────────────┼────────────────────┼───┼────────────────────┼──────────┤
-│ ~ react                      │      ^18.3.1       │ → │      ^19.2.0       │ 2        │
+│ ~ react                      │      ^18.3.1       │ → │      ^19.2.0       │ major    │
 └──────────────────────────────┴────────────────────┴───┴────────────────────┴──────────┘
 ```
 
@@ -309,11 +309,13 @@ npm run build
 npm-dep-diff/
 ├── src/                     # Source code
 |   ├── options/             # CLI options classes
-|   ├── output/               # Output formatters
+|   ├── output/              # Output formatters
 ├── tests/                   # Test files
-│   └── ut/                  # Unit tests
+|   ├── files/               # Example package.json files
+│   ├── ut/                  # Unit tests
+|   └── it/                  # Integration tests
 ├── tools/                   # Build tools
-└── build/                   # Compiled output
+└── dist/                    # Compiled output
 ```
 
 ---
