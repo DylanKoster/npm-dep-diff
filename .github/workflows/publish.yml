@@ -5,25 +5,56 @@ on:
     types: [published]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '25.x'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install typescript
+        run: npm i --no-save typescript
+
+      - name: Build npm-dep-diff
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-dep-diff-build
+          path: dist/
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: error
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '25.x'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-dep-diff-build
+          path: dist/
 
       - name: Run tests
-        run: npm test
+        run: npm ci && npm run test
 
   publish:
     needs: test
@@ -41,11 +72,11 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-dep-diff-build
+          path: dist/
 
       - name: Publish to NPM
         run: npm publish dist/
