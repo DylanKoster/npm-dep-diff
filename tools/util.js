@@ -52,6 +52,12 @@ export function cleanPackageJson() {
     delete packageJson[key];
   });
 
+  // Fix bin to be an object
+  if (packageJson.bin && typeof packageJson.bin === 'string') {
+    stdout.write(`  - Converting bin to object\n`);
+    packageJson.bin = { [packageJson.name]: packageJson.bin };
+  }
+
   return packageJson;
 }
 
