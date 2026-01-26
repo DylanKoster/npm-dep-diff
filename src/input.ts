@@ -5,6 +5,12 @@ export const enum InputType {
   NPM = 'npm',
   GIT = 'git',
   FILE = 'file',
+  GITHUB = 'github',
+  GITLAB = 'gitlab',
+  BITBUCKET = 'bitbucket',
+  GITEA = 'gitea',
+  FORGEJO = 'forgejo',
+  AZURE = 'azure',
 }
 
 export type InputSource = {
@@ -36,6 +42,36 @@ export function parseSource(src: string): InputSource {
       type: InputType.FILE,
       source: src.substring(5),
     } as InputSource;
+  } else if (src.toLowerCase().startsWith('github:')) {
+    return {
+      type: InputType.GITHUB,
+      source: src.substring(7),
+    } as InputSource;
+  } else if (src.toLowerCase().startsWith('gitlab:')) {
+    return {
+      type: InputType.GITLAB,
+      source: src.substring(7),
+    } as InputSource;
+  } else if (src.toLowerCase().startsWith('bitbucket:')) {
+    return {
+      type: InputType.BITBUCKET,
+      source: src.substring(10),
+    } as InputSource;
+  } else if (src.toLowerCase().startsWith('gitea:')) {
+    return {
+      type: InputType.GITEA,
+      source: src.substring(6),
+    } as InputSource;
+  } else if (src.toLowerCase().startsWith('forgejo:')) {
+    return {
+      type: InputType.FORGEJO,
+      source: src.substring(8),
+    } as InputSource;
+  } else if (src.toLowerCase().startsWith('azure:')) {
+    return {
+      type: InputType.AZURE,
+      source: src.substring(6),
+    } as InputSource;
   }
 
   // For now, default to file.
@@ -64,6 +100,14 @@ export function getPackageFromInput(source: InputSource): Promise<object> {
       return getPackageFromGit(source);
     case InputType.NPM:
       return getPackageFromNpm(source);
+    case InputType.GITHUB:
+    case InputType.GITLAB:
+    case InputType.BITBUCKET:
+    case InputType.GITEA:
+    case InputType.FORGEJO:
+    case InputType.AZURE:
+      return getPackageFromRemote(source);
+    
     default:
       throw Error(`Unknown source type, got ${source.type}`);
   }
@@ -205,9 +249,72 @@ function getPackageFromNpm(input: InputSource): Promise<object> {
   });
 }
 
+/**
+ * Returns the JSON object that resembles the contents of the remote git host.
+ * Automatically finds the package.json that belongs to the repository.
+ * 
+ * @param source The remote git host whose package.json should be parsed to JSON.
+ * 
+ * @throws Error if input type is not a remote git host.
+ * 
+ * @returns A Promise that resolves to an JSON object representing the source file contents.
+ */
+function getPackageFromRemote(input: InputSource): Promise<object> {
+  return new Promise(function (resolve, reject) {
+    let url: string;
+    
+    // Default ref is main.
+    let ref: string = 'main';
+    let name: string = input.source;
+    const regex: RegExp = /.+@.+/;
+    if (regex.test(input.source)) {
+      const split: string[] = input.source.split("@");
+      ref = split.pop();
+      name = split.join("@");
+    }
+    
+    switch (input.type) {
+      case InputType.GITHUB:
+        url = `https://raw.githubusercontent.com/${name}/${ref}/package.json`;
+        break;
+      case InputType.GITLAB:
+        url = `https://gitlab.com/${name}/-/raw/${ref}/package.json`;
+        break;
+      case InputType.BITBUCKET:
+        url = `https://bitbucket.org/${name}/raw/${ref}/package.json`;
+        break;
+      case InputType.GITEA:
+        url = `${name}/raw/${ref}/package.json`;
+        break;
+      case InputType.FORGEJO:
+        url = `${name}/raw/${ref}/package.json`;
+        break;
+      default:
+        reject(`Wrong type, expected remote git host, got ${input.type}.`);
+    }
+
+    return fetch(url)
+      .then((resp: Response) => {
+        if (resp.status < 200 || resp.status >= 300) {
+          reject(`Status of call ${url} is not OK.`);
+        }
+        return resp.text();
+      }).then((text: string) => {
+        try {
+          resolve(JSON.parse(text));
+        } catch (err) {
+          reject('Error parsing JSON.');
+        }
+      }).catch((err) => {
+        reject(`Error thrown while gathering manifest from ${url}: ${err}`);
+      });
+  });
+};
+
 // Export private functions only in testing environment
 if (process.env['NODE_DEV'] == 'TEST') {
   module.exports.getPackageFromFile = getPackageFromFile;
   module.exports.getPackageFromGit = getPackageFromGit;
   module.exports.getPackageFromNpm = getPackageFromNpm;
+  module.exports.getPackageFromRemote = getPackageFromRemote;
 }

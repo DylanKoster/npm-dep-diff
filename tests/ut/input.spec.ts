@@ -7,6 +7,8 @@ import {
   getPackageFromGit,
   // @ts-expect-error
   getPackageFromNpm,
+  // @ts-expect-error
+  getPackageFromRemote,
   InputSource,
   InputType,
 } from '../../src/input';
@@ -247,5 +249,129 @@ describe('test getPackageFromNpm', () => {
     ).rejects.toMatch(
       'Version 0.0.1 not found for package base-sepolia-starter',
     );
+  });
+});
+
+describe('test getPackageFromRemote', () => {
+  it('should return valid JSON from GitHub', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.GITHUB,
+      source: 'microsoft/TypeScript@main',
+    } as InputSource);
+
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('typescript');
+  });
+
+  it('should use default ref "main" for GitHub when no ref is specified', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.GITHUB,
+      source: 'microsoft/TypeScript',
+    } as InputSource);
+
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('typescript');
+  });
+
+  it('should handle custom refs with @ symbol', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.GITHUB,
+      source: 'microsoft/TypeScript@v5.3.3',
+    } as InputSource);
+
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('typescript');
+    expect(json['version']).toBe('5.3.3');
+    expect(json['devDependencies']['chai']).toBe('^4.3.7');
+  });
+
+  it('should reject with wrong input type', () => {
+    expect(
+      getPackageFromRemote({
+        type: InputType.FILE,
+        source: 'some/path',
+      } as InputSource),
+    ).rejects.toMatch('Wrong type, expected remote git host, got file.');
+  });
+
+  it('should reject with NPM type', () => {
+    expect(
+      getPackageFromRemote({
+        type: InputType.NPM,
+        source: 'some-package',
+      } as InputSource),
+    ).rejects.toMatch('Wrong type, expected remote git host, got npm.');
+  });
+
+  it('should reject with GIT type', () => {
+    expect(
+      getPackageFromRemote({
+        type: InputType.GIT,
+        source: 'some-ref',
+      } as InputSource),
+    ).rejects.toMatch('Wrong type, expected remote git host, got git.');
+  });
+
+  it('should reject when HTTP status is not OK', () => {
+    expect(
+      getPackageFromRemote({
+        type: InputType.GITHUB,
+        source: 'nonexistent-user/nonexistent-repo@main',
+      } as InputSource),
+    ).rejects.toMatch('Status of call');
+  });
+
+  it('should work with GitLab', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.GITLAB,
+      source: 'gitlab-org/gitlab@v17.9.8-ee',
+    } as InputSource);
+   
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['private']).toBe(true);
+    expect(json['dependencies']['@apollo/client']).toBe('^3.5.10');
+    expect(json['devDependencies']['@eslint/js']).toBe('^9.15.0');
+  });
+
+  it('should work with Bitbucket', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.BITBUCKET,
+      source: 'atlassian/atlassian-connect-express@v8.6.0',
+    } as InputSource);
+  
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('atlassian-connect-express');
+    expect(json['version']).toBe('8.6.0');
+    expect(json['dependencies']['colors']).toBe('1.4.0');
+  });
+
+  it('should work with Gitea', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.GITEA,
+      source: 'https://opendev.org/openstack/horizon@tag/25.3.1',
+    } as InputSource);
+
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('horizon');
+    expect(json['version']).toBe('0.0.0'); // ?
+    expect(json['devDependencies']['karma']).toBe('5.2.3');
+  });
+
+  it('should work with Forgejo', async () => {
+    const json: object = await getPackageFromRemote({
+      type: InputType.FORGEJO,
+      source: 'https://codeberg.org/forgejo/forgejo/@tag/v11.0.8',
+    } as InputSource);
+    expect(json).toBeDefined();
+    expect(typeof json).toBe('object');
+    expect(json['name']).toBe('forgejo');
+    expect(json['dependencies']['chart.js']).toBe('4.4.5');
+    expect(json['devDependencies']['globals']).toBe('16.0.0');
   });
 });
