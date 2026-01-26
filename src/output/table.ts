@@ -6,7 +6,11 @@ import stripAnsi from 'strip-ansi';
 
 export class DepDiffTable implements IDepDiffOutputFormat {
   constructor(private toFile: boolean) {
-    if (this.toFile) chalk.level = 0;
+    if (this.toFile) {
+      chalk.level = 0;
+    } else {
+      chalk.level = 3;
+    }
   }
 
   public formatDiffs(diffs: DepDiffs): string {
