@@ -146,9 +146,9 @@ describe('CLI Integration Tests', () => {
       (err, stdout, stderr) => {
         expect(err).toBeNull();
         expect(stderr).toBe('');
+
         // Test for ANSI color codes
         // Orange for major changes
-        console.log("orange");
         const orange: string = '\x1b[38;2;255;165;0m';
         expect(stdout).toContain(`${orange}~ react`);
         expect(stdout).toContain(`${orange}^18.3.1`);
@@ -157,14 +157,12 @@ describe('CLI Integration Tests', () => {
         expect(stdout).toContain(`${orange}major`);
 
         // Cyan dependency header titles
-        console.log("cyan");
         const cyan: string = '\u001b[36m';
         expect(stdout).toContain(`${cyan}dependencies`); // Cya ANSI escape code
         expect(stdout).toContain(`${cyan}devDependencies`); // Cya ANSI escape code
         expect(stdout).toContain(`${cyan}peerDependencies`); // Cya ANSI escape code
         
         // Gray header column labels
-        console.log("gray");
         const gray: string = `\u001b[90m`;
         expect(stdout).toContain(`${gray}from`);
         expect(stdout).toContain(`${gray}→`);
@@ -172,21 +170,18 @@ describe('CLI Integration Tests', () => {
         expect(stdout).toContain(`${gray}type`);
         
         // Green for added dependencies
-        console.log("green");
         const green: string = '\u001b[32m';
         expect(stdout).toContain(`${green}+ next`);
         expect(stdout).toContain(`${green}15.0.0`);
         expect(stdout).toContain(`${green}added`); 
 
         // Red for removed dependencies
-        console.log("red");
         const red: string = '\u001b[91m';
         expect(stdout).toContain(`${red}- vite`);
         expect(stdout).toContain(`${red}^5.2.0`);
         expect(stdout).toContain(`${red}removed`);
         
         // Yellow for minor and patch changes
-        console.log("yellow");
         const yellow: string = '\u001b[33m';
         expect(stdout).toContain(`${yellow}~ eslint`);
         expect(stdout).toContain(`${yellow}^9.4.0`);
@@ -195,7 +190,6 @@ describe('CLI Integration Tests', () => {
         expect(stdout).toContain(`${yellow}minor`);
 
         const yellowBright: string = '\u001b[93m';
-
         expect(stdout).toContain(`${yellowBright}~ tailwindcss`);
         expect(stdout).toContain(`${yellowBright}^3.4.9`);
         expect(stdout).toContain(`${yellowBright}→`);
