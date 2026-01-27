@@ -760,12 +760,6 @@ describe('test getDifferences function', () => {
           type: DiffType.removed,
         },
         {
-          package: 'tailwindcss',
-          old: '^3.4.9',
-          new: undefined,
-          type: DiffType.removed,
-        },
-        {
           package: 'framer-motion',
           old: '^11.3.2',
           new: undefined,
@@ -782,6 +776,12 @@ describe('test getDifferences function', () => {
           old: '^18.3.1',
           new: '^19.2.0',
           type: DiffType.major,
+        },
+        {
+          package: 'tailwindcss',
+          old: '^3.4.9',
+          new: '^3.4.10',
+          type: DiffType.patch,
         },
       ],
       devDependencies: [
@@ -836,12 +836,6 @@ describe('test getDifferences function', () => {
           type: DiffType.added,
         },
         {
-          package: 'tailwindcss',
-          old: undefined,
-          new: '^3.4.9',
-          type: DiffType.added,
-        },
-        {
           package: 'framer-motion',
           old: undefined,
           new: '^11.3.2',
@@ -877,9 +871,15 @@ describe('test getDifferences function', () => {
           new: '^18.3.1',
           type: DiffType.major,
         },
+        {
+          package: 'tailwindcss',
+          new: '^3.4.9',
+          old: '^3.4.10',
+          type: DiffType.patch,
+        },
       ],
     };
-
+    
     expect(
       NpmDepDiff.getDifferences(pckg6, pckg3, DepDiffSection.deps),
     ).toStrictEqual(diff1);
